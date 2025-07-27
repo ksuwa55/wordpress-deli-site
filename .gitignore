@@ -1,0 +1,44 @@
+# -------------------------------
+# WordPress開発
+# -------------------------------
+wordpress/wp-content/uploads/
+wordpress/wp-content/cache/
+wordpress/wp-content/upgrade/
+
+# WordPress本体を管理しない場合
+wordpress/wp-admin/
+wordpress/wp-includes/
+wordpress/license.txt
+wordpress/readme.html
+
+# -------------------------------
+# Docker 関連
+# -------------------------------
+*.log
+*.pid
+*.sock
+
+# Dockerボリュームとして使っている場合
+db_data/
+*.sql
+*.env
+.env.local
+.env.*
+
+# -------------------------------
+# エディタ・OSによる一時ファイル
+# -------------------------------
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# -------------------------------
+# その他（自動生成ファイル等）
+# -------------------------------
+node_modules/
+dist/
+build/
