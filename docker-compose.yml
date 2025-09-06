@@ -1,21 +1,4 @@
-version: '3'
-
 services:
-  wordpress:
-    image: wordpress:latest
-    platform: linux/amd64
-    ports:
-      - "8000:80"
-    environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-    volumes:
-      - ./wordpress:/var/www/html
-    depends_on:
-      - db
-
   db:
     image: mysql/mysql-server:5.7
     platform: linux/amd64
@@ -26,18 +9,53 @@ services:
       MYSQL_PASSWORD: wordpress
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  wordpress:
+    image: wordpress:latest
+    platform: linux/amd64
+    ports: ["8000:80"]
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    volumes:
+      - ./wordpress:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     platform: linux/amd64
-    ports:
-      - "8080:80"
+    ports: ["8080:80"]
     environment:
       PMA_HOST: db
       PMA_USER: root
       PMA_PASSWORD: root
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+  wpcli:
+    image: wordpress:cli
+    platform: linux/amd64
+    volumes:
+      - ./wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: wp
 
 volumes:
   db_data:
